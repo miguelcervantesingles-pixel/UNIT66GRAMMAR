@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Present Perfect Race – 6th Grade – Teacher Lizbeth Garay</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Nunito',sans-serif;background:#1a1a2e;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;}
+.screen.hidden{display:none;}
+#round-screen{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);}
+
+/* INTRO */
+#intro-screen{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);overflow:hidden;}
+#intro-screen h1{font-family:'Fredoka One',cursive;font-size:clamp(1.4rem,5vw,2.8rem);text-align:center;margin-bottom:.3rem;line-height:1.2;padding:0 1rem;position:relative;z-index:10;}
+#intro-screen h2{font-size:clamp(.85rem,2.5vw,1.2rem);color:#ffd700;margin-bottom:1.5rem;text-align:center;position:relative;z-index:10;}
+#intro-screen .card{position:relative;z-index:10;}
+.card{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.2);border-radius:20px;padding:1.5rem 1.8rem;width:min(92vw,400px);display:flex;flex-direction:column;gap:1rem;}
+.card label{color:#ddd;font-size:.9rem;margin-bottom:.2rem;display:block;}
+.card input,.card select{width:100%;padding:.65rem 1rem;border-radius:12px;border:2px solid #555;background:#1a1a2e;color:#fff;font-size:1.05rem;font-family:'Nunito',sans-serif;outline:none;}
+.card input:focus,.card select:focus{border-color:#ffd700;}
+.card select option{background:#1a1a2e;}
+.btn{font-family:'Fredoka One',cursive;font-size:1.3rem;padding:.75rem 2rem;border:none;border-radius:50px;cursor:pointer;background:linear-gradient(135deg,#f7971e,#ffd200);color:#1a1a2e;box-shadow:0 4px 20px rgba(255,210,0,.4);transition:transform .15s;align-self:center;}
+.btn:active{transform:scale(.96);}
+
+/* Floating decor */
+.floating-item{position:absolute;font-size:clamp(1.5rem,5vw,3.5rem);opacity:0.25;pointer-events:none;z-index:1;animation:floatAnim linear infinite;}
+@keyframes floatAnim{0%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-30px) rotate(10deg);}100%{transform:translateY(0) rotate(0deg);}}
+
+/* GAME */
+#game-screen{background:#000;padding:0;align-items:stretch;justify-content:flex-start;}
+#hud{display:flex;justify-content:space-between;align-items:center;padding:.3rem .7rem;background:#1a1a2e;flex-shrink:0;border-bottom:3px solid #e74c3c;gap:.4rem;flex-wrap:wrap;}
+.hud-item{color:#fff;font-size:.8rem;background:rgba(255,255,255,.1);border-radius:8px;padding:.15rem .55rem;white-space:nowrap;}
+.hud-item span{color:#e74c3c;font-weight:800;}
+#raceCanvas{display:block;flex:1;min-height:0;}
+#sentence-area{background:#1a1a2e;border-bottom:3px solid #e74c3c;padding:.4rem .8rem .35rem;flex-shrink:0;}
+#spanish-hint{font-size:clamp(.95rem,3vw,1.4rem);color:#ffd700;text-align:center;font-style:italic;margin-bottom:.25rem;min-height:1.3em;}
+#sentence-built{font-size:clamp(.85rem,3vw,1.15rem);color:#fff;text-align:center;min-height:1.4em;margin-bottom:.15rem;line-height:1.4;}
+#target-hint{font-size:clamp(.6rem,1.8vw,.85rem);color:#aaa;text-align:center;font-style:italic;}
+
+/* Mobile */
+#mobile-controls{position:fixed;bottom:0;left:0;right:0;display:none;z-index:200;}
+#mobile-controls button{flex:1;height:62px;font-size:1.9rem;background:rgba(0,0,0,.65);color:#fff;border:none;border-top:2px solid #e74c3c;font-family:'Fredoka One',cursive;}
+@media(max-width:900px){#mobile-controls{display:flex;}}
+
+/* CRASH */
+#crash-overlay{position:fixed;inset:0;z-index:300;background:rgba(200,0,0,.78);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+#crash-overlay.show{opacity:1;pointer-events:all;}
+#crash-overlay h2{font-family:'Fredoka One',cursive;font-size:clamp(2rem,6vw,3.5rem);color:#fff;text-shadow:0 0 20px #000;}
+#crash-overlay p{color:#ffe;font-size:clamp(.9rem,2.5vw,1.2rem);margin:.5rem 1rem 1.5rem;text-align:center;}
+
+/* MATCHING GAME */
+#match-screen{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);padding:1rem;overflow-y:auto;}
+#match-screen h2{font-family:'Fredoka One',cursive;font-size:clamp(1.2rem,3.5vw,2rem);color:#e74c3c;text-align:center;margin-bottom:.2rem;}
+#match-screen>p{color:#ccc;text-align:center;margin-bottom:.6rem;font-size:.9rem;}
+#match-score{color:#ffd700;font-weight:800;}
+#match-area{display:flex;gap:clamp(1.5rem,4vw,3rem);justify-content:center;align-items:center;width:min(96vw,600px);margin:.3rem auto;}
+#match-left,#match-right{flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem;}
+.tire-label{color:#888;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.tire-wrapper{width:min(38vw,200px);height:min(38vw,200px);aspect-ratio:1/1;}
+.tire-tread{width:100%;height:100%;border-radius:50%;background:#2c2c2c;border:4px solid #1a1a1a;box-shadow:0 0 0 3px #444,0 0 0 5px #222,inset 0 0 20px rgba(0,0,0,.5);position:relative;display:flex;align-items:center;justify-content:center;transition:all .25s;}
+.tire-tread::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:3px dashed #555;opacity:.7;pointer-events:none;}
+#tire-english-tread{border-color:#1a1a1a;}
+#tire-english-tread.pulse{animation:treadpulse 3s ease-in-out;}
+@keyframes treadpulse{0%,100%{box-shadow:0 0 0 3px #444,0 0 0 5px #222;}50%{box-shadow:0 0 0 5px #2ecc71,0 0 0 7px #222;}}
+#tire-english-tread.caught{border-color:#2ecc71;box-shadow:0 0 0 3px #2ecc71,0 0 0 5px #222,0 0 30px rgba(46,204,113,.5);background:#1c3c1c;}
+#tire-english-tread.wrong{border-color:#e74c3c;box-shadow:0 0 0 3px #e74c3c,0 0 0 5px #222,0 0 30px rgba(231,76,60,.5);background:#3c1c1c;animation:shake .3s;}
+.tire-rim{width:55%;height:55%;border-radius:50%;background:linear-gradient(135deg,#888,#ccc,#aaa,#777);border:3px solid #666;box-shadow:inset 0 0 10px rgba(0,0,0,.3),0 0 5px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;position:relative;}
+.tire-rim::after{content:'';position:absolute;width:70%;height:70%;border-radius:50%;border:2px dotted #999;opacity:.5;}
+.tire-text{color:#111;font-size:clamp(.55rem,1.6vw,.85rem);font-family:'Nunito',sans-serif;font-weight:900;text-align:center;line-height:1.15;text-shadow:0 0 4px rgba(255,255,255,.3);z-index:1;word-break:break-word;max-width:90%;}
+#tire-current-spanish{color:#000;font-size:clamp(.5rem,1.5vw,.8rem);}
+#match-actions{text-align:center;margin:.2rem 0;}
+#match-click-btn{font-size:1.1rem;padding:.4rem 1.5rem;}
+.tire-hint{text-align:center;color:#aaa;font-size:.8rem;font-style:italic;margin:.2rem 0;}
+#match-completed{width:min(96vw,600px);margin:.3rem auto;display:flex;flex-direction:column;gap:.25rem;}
+.match-done{display:flex;justify-content:space-between;align-items:center;background:rgba(46,204,113,.12);border:2px solid #2ecc71;border-radius:20px;padding:.25rem .7rem;font-size:clamp(.65rem,1.5vw,.8rem);color:#fff;font-weight:700;}
+.match-done .md-left{color:#ffd700;}
+.match-done .md-right{color:#2ecc71;}
+.match-done .md-check{color:#2ecc71;font-size:.9rem;}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+#match-next-btn{display:none;margin-top:.8rem;}
+
+/* REPORT */
+#report-screen{background:linear-gradient(135deg,#1a1a2e,#0f3460);overflow-y:auto;padding:1.5rem 1rem;}
+#report-card{background:#fff;border-radius:20px;padding:1.8rem 2rem;width:min(92vw,520px);color:#1a1a2e;box-shadow:0 10px 50px rgba(0,0,0,.5);text-align:center;}
+#report-card h1{font-family:'Fredoka One',cursive;font-size:1.9rem;color:#0f3460;}
+#report-card h2{font-size:1rem;color:#555;margin:.2rem 0 1rem;}
+.report-row{display:flex;justify-content:space-between;padding:.38rem 0;border-bottom:1px solid #eee;font-size:.95rem;text-align:left;}
+.grade-big{font-family:'Fredoka One',cursive;font-size:3.8rem;margin:.4rem 0;}
+.grade-big.a{color:#2ecc71;} .grade-big.b{color:#f39c12;} .grade-big.c{color:#e74c3c;}
+.rc-stars{font-size:1.8rem;margin:.4rem 0;}
+.rc-tip{font-size:.82rem;color:#666;margin-top:.4rem;font-style:italic;}
+.screenshot-hint{color:#aaa;font-size:.82rem;margin-top:.9rem;text-align:center;}
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div class="screen" id="intro-screen">
+  <div id="floating-decor"></div>
+  <h1 id="main-title"></h1>
+  <h2>🏎️ Present Perfect Race 🏎️</h2>
+  <div class="card">
+    <div>
+      <label>👤 Your full name:</label>
+      <input type="text" id="student-name" placeholder="e.g. Maria Lopez" autocomplete="off">
+    </div>
+    <div>
+      <label>📚 Your group:</label>
+      <select id="student-group">
+        <option value="">-- Select group --</option>
+        <option value="A">Group A</option>
+        <option value="B">Group B</option>
+      </select>
+    </div>
+    <button class="btn" onclick="startGame()">🚦 START RACE!</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="screen hidden" id="game-screen">
+  <div id="sentence-area">
+    <div id="spanish-hint"></div>
+    <div id="sentence-built"></div>
+    <div id="target-hint"></div>
+  </div>
+  <div id="hud">
+    <div class="hud-item">⏱ <span id="hud-time">0</span>s</div>
+    <div class="hud-item">🔥 Score: <span id="hud-score">10.0</span></div>
+    <div class="hud-item">💥 Crashes: <span id="hud-crashes">0</span>/3</div>
+    <div class="hud-item">📝 <span id="hud-label">Phase 1</span> <span id="hud-sent">1</span>/<span id="hud-total">8</span></div>
+  </div>
+  <canvas id="raceCanvas"></canvas>
+</div>
+
+<!-- CRASH -->
+<div id="crash-overlay">
+  <h2>💥 CRASH!</h2>
+  <p id="crash-msg"></p>
+  <button class="btn" id="crash-btn" onclick="resumeAfterCrash()">🚗 Try Again!</button>
+</div>
+
+<!-- ROUND COUNTDOWN -->
+<div class="screen hidden" id="round-screen">
+  <h2 id="round-title" style="font-family:'Fredoka One',cursive;font-size:clamp(2rem,6vw,4rem);color:#e74c3c;margin-bottom:.3rem;">🏁 PHASE 2 🏁</h2>
+  <div style="font-family:'Fredoka One',cursive;font-size:clamp(4rem,12vw,8rem);color:#fff;text-shadow:0 0 40px #e74c3c;" id="round-count">3</div>
+  <p id="round-desc" style="color:#ccc;font-size:1rem;margin-top:.5rem;">Pick the correct past participle!</p>
+</div>
+
+<!-- MATCHING GAME (Phase 3) -->
+<div class="screen hidden" id="match-screen">
+  <h2>🔗 Match the Tires!</h2>
+  <p>Click <strong>CATCH IT</strong> when the English tire matches! Score: <span id="match-score">10.0</span></p>
+  <div id="match-area">
+    <div id="match-left">
+      <div class="tire-wrapper"><div class="tire-tread"><div class="tire-rim"><span class="tire-text" id="tire-current-spanish">vecindario</span></div></div></div>
+      <div class="tire-label">SPANISH</div>
+    </div>
+    <div id="match-right">
+      <div class="tire-wrapper"><div class="tire-tread" id="tire-english-tread"><div class="tire-rim"><span class="tire-text" id="tire-cycling-english">neighborhood</span></div></div></div>
+      <div class="tire-label">ENGLISH</div>
+    </div>
+  </div>
+  <div id="match-actions">
+    <button class="btn" id="match-click-btn" onclick="catchTire()">⏱ CATCH IT!</button>
+  </div>
+  <div id="match-hint" class="tire-hint">Wait for the matching English word!</div>
+  <div id="match-completed"></div>
+  <button class="btn" id="match-next-btn" onclick="finishMatchPhase()" style="display:none;margin-top:.8rem;">🏁 See My Results!</button>
+</div>
+
+<!-- REPORT -->
+<div class="screen hidden" id="report-screen">
+  <div id="report-card">
+    <h1>🏆 Report Card</h1>
+    <h2>Present Perfect – Teacher Lizbeth Garay</h2>
+    <div class="report-row"><span>Student:</span><strong id="rc-name"></strong></div>
+    <div class="report-row"><span>Group:</span><strong id="rc-group"></strong></div>
+    <div class="report-row"><span>Date:</span><strong id="rc-date"></strong></div>
+    <div class="report-row"><span>Time:</span><strong id="rc-time"></strong></div>
+    <div class="report-row"><span>Crashes:</span><strong id="rc-crashes"></strong></div>
+    <div class="report-row"><span>Phase 1 – Sentences:</span><strong id="rc-sent-score"></strong></div>
+    <div class="report-row"><span>Phase 2 – Past Participles:</span><strong id="rc-verb-score"></strong></div>
+    <div class="report-row"><span>Phase 3 – Vocabulary:</span><strong id="rc-vocab-score"></strong></div>
+    <div class="report-row"><span><b>Final Grade:</b></span><strong id="rc-final-label"></strong></div>
+    <div class="grade-big" id="rc-grade"></div>
+    <div class="rc-stars" id="rc-stars"></div>
+    <div class="rc-tip" id="rc-tip"></div>
+  </div>
+  <p class="screenshot-hint">📸 Take a screenshot to save your report card!</p>
+  <button class="btn" onclick="location.reload()" style="margin-top:1rem;">🔄 Play Again</button>
+</div>
+
+<!-- Mobile controls -->
+<div id="mobile-controls">
+  <button id="btn-left"  ontouchstart="keysDown.left=true"  ontouchend="keysDown.left=false"  onmousedown="keysDown.left=true"  onmouseup="keysDown.left=false">◀ Left</button>
+  <button id="btn-right" ontouchstart="keysDown.right=true" ontouchend="keysDown.right=false" onmousedown="keysDown.right=true" onmouseup="keysDown.right=false">Right ▶</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════
+var phase='sentence';
+var COLORS = ['#e74c3c','#e67e22','#f1c40f','#2ecc71','#1abc9c','#3498db','#9b59b6','#e91e63','#ff5722','#00e5ff','#ff6f00','#76ff03'];
+
+// Phase 1 – Present Perfect Sentences (last part grouped together)
+// Wrongs use realistic-looking alternatives: different pronouns/auxiliaries/verb forms
+var SENTENCES = [
+   { spanish:'¿Ya ha enviado ella las invitaciones? Sí, ya las ha enviado.',
+    words:  ['Has','she','sent the invitations','yet?','Yes','she','already has.'],
+    wrongs: ['Have','he','send the invitations','already?','No','he','already hasn\'t.'] },
+  { spanish:'¿Ya han elegido ellos la música? No, todavía no.',
+    words:  ['Have','they','chosen the music','yet?','No','they',"haven't yet."],
+    wrongs: ['Has','we','choose the music','already?','Yes','we','have yet.'] },
+   { spanish:'¿Ya ha decorado él el jardín? Sí, ya lo ha hecho.',
+    words:  ['Has','he','decorated the yard','yet?','Yes','he','has.'],
+    wrongs: ['Have','she','decorate the yard','already?','No','she',"hasn't."] },
+  { spanish:'¿Ya hemos hecho los disfraces? No, todavía no.',
+    words:  ['Have','we','made the costumes','yet?','No','we',"haven't."],
+    wrongs: ['Has','they','make the costumes','already?','Yes','they','have.'] },
+  { spanish:'¿Ya han organizado ustedes los juegos? Sí, ya los organizamos.',
+    words:  ['Have','you','organized the games','yet?','Yes','we','have.'],
+    wrongs: ['Has','she','organize the games','already?','No','they','haven\'t.'] },
+  { spanish:'¿Ya ha comprado ella los premios? No, todavía no.',
+    words:  ['Has','she','bought the prizes','yet?','No','she',"hasn't."],
+    wrongs: ['Have','he','buy the prizes','already?','Yes','he','has.'] },
+  { spanish:'¿Ya ha preparado él la comida? Sí, ya la preparó.',
+    words:  ['Has','he','prepared the party food','yet?','Yes','he','has.'],
+    wrongs: ['Have','they','prepare the party food','already?','No','they','haven\'t.'] },
+  { spanish:'¿Ya han pedido prestadas las sillas? Sí, ya las pidieron.',
+    words:  ['Have','they','borrowed the chairs','yet?','Yes','they','have.'],
+    wrongs: ['Has','we','borrow the chairs','already?','No','we','haven\'t.'] },
+];
+
+// Phase 2 – Past Participle of Verbs
+// Irregular (past≠participle): show base→past→participle in prompt
+// Regular (same): just base form, wrong = 3rd person present (-s)
+var VERBS = [
+  { prompt:'enviar en el 3° piso',       correct:'sent',     wrong:'sended' },
+  { prompt:'elegir en el 3° piso',      correct:'chosen',   wrong:'choosed' },
+  { prompt:'decorar en el 3° piso',     correct:'decorated', wrong:'decorate' },
+  { prompt:'hacer en el 3° piso',       correct:'made',     wrong:'maked' },
+  { prompt:'organizar en el 3° piso',   correct:'organized', wrong:'organize' },
+  { prompt:'comprar en el 3° piso',     correct:'bought',   wrong:'buyed' },
+  { prompt:'preparar en el 3° piso',    correct:'prepared',  wrong:'prepare' },
+  { prompt:'pedir prestado 3° piso',   correct:'borrowed',  wrong:'borrow' },
+  { prompt:'regar en el 3° piso',       correct:'watered',   wrong:'water' },
+  { prompt:'ser/estar en el 3° piso',   correct:'been',      wrong:'beed' },
+  { prompt:'trabajar en el 3° piso',    correct:'worked',    wrong:'work' },
+  { prompt:'ordenar en el 3° piso',     correct:'tidied',    wrong:'tidy' },
+];
+
+// Phase 3 – Vocabulary for matching game
+// VocabPhase3 arrays for matching
+var VOCAB_SPANISH = ['vecindario','ser voluntario','ser tutor','recoger el correo','regar las plantas','ordenar el jardín','bote de basura','trabajar juntos'];
+var VOCAB_ENGLISH = ['neighborhood','be a volunteer','be a tutor','collect the mail','water the plants','tidy the yard','trash can','work together'];
+
+var BG_THEMES = [
+  {skyTop:'#5DADE2',skyBot:'#AED6F1',grass:'#27AE60'},
+  {skyTop:'#E67E22',skyBot:'#F0B27A',grass:'#784212'},
+  {skyTop:'#1C2833',skyBot:'#2C3E50',grass:'#1E8449'},
+  {skyTop:'#AED6F1',skyBot:'#D6EAF8',grass:'#95A5A6'},
+  {skyTop:'#F9E79F',skyBot:'#FDEBD0',grass:'#1D8348'},
+  {skyTop:'#5D6D7E',skyBot:'#85929E',grass:'#4A6741'},
+  {skyTop:'#922B21',skyBot:'#CB4335',grass:'#6E2F1A'},
+  {skyTop:'#1A5276',skyBot:'#2E86C1',grass:'#145A32'},
+  {skyTop:'#C39BD3',skyBot:'#E8DAEF',grass:'#6C3483'},
+];
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+var studentName='', studentGroup='';
+var score=10, crashes=0;
+var currentSentence=0, currentWord=0;
+var gameRunning=false, crashed=false;
+var startTime=0, elapsedSecs=0, timerInt=null;
+var sentPhaseScore=10, verbPhaseScore=0, vocabPhaseScore=10;
+var sentPhaseCrashes=0, verbPhaseCrashes=0, vocabPhaseCrashes=0;
+var sentPhasePlayed=false, verbPhasePlayed=false, vocabPhasePlayed=false;
+var keysDown={left:false,right:false};
+var animFrame=null;
+
+// Canvas globals
+var canvas, ctx;
+var CW=600, CH=400;
+var CAR_X=300;
+var CAR_Y_FRAC=0.82;
+
+// Panel state
+var panelRoadY = 0.18;
+var PANEL_SPEED = 0.0015;  // default, overridden per phase below
+function getPanelSpeed(){
+  return phase==='verb' ? 0.0015 : 0.002;
+}
+var leftPanel=null, rightPanel=null;
+var hitCooldown=0;
+var panelLastLeft=null, panelStreak=0;
+
+// ═══════════════════════════════════════════
+//  FLOATING DECORATIONS ON INTRO
+// ═══════════════════════════════════════════
+(function(){
+  var container=document.getElementById('floating-decor');
+  var icons=['🏆','🥇','🏅','🚗','🏎️','🎖️','🏁','🚦'];
+  for(var i=0;i<12;i++){
+    var el=document.createElement('div');
+    el.className='floating-item';
+    el.textContent=icons[i%icons.length];
+    el.style.left=(Math.random()*90+5)+'%';
+    el.style.top=(Math.random()*80+5)+'%';
+    el.style.fontSize=(1.5+Math.random()*2.5)+'rem';
+    el.style.animationDuration=(3+Math.random()*4)+'s';
+    el.style.animationDelay=(Math.random()*3)+'s';
+    el.style.opacity=(0.15+Math.random()*0.2);
+    container.appendChild(el);
+  }
+})();
+
+// ═══════════════════════════════════════════
+//  RAINBOW TITLE
+// ═══════════════════════════════════════════
+(function(){
+  var text='Present Perfect\nby Teacher Lizbeth Garay';
+  var html='';
+  for(var i=0;i<text.length;i++){
+    var c=text[i];
+    if(c==='\n'){html+='<br>';continue;}
+    if(c===' '){html+=' ';continue;}
+    html+='<span style="color:'+COLORS[i%COLORS.length]+'">'+c+'</span>';
+  }
+  document.getElementById('main-title').innerHTML=html;
+})();
+
+// ═══════════════════════════════════════════
+//  START
+// ═══════════════════════════════════════════
+function startGame(){
+  studentName=document.getElementById('student-name').value.trim();
+  studentGroup=document.getElementById('student-group').value;
+  if(!studentName){alert('Please enter your name!');return;}
+  if(!studentGroup){alert('Please select your group!');return;}
+
+  showScreen('game-screen');
+
+  canvas=document.getElementById('raceCanvas');
+  ctx=canvas.getContext('2d');
+  resizeCanvas();
+  window.addEventListener('resize',resizeCanvas);
+
+  window.addEventListener('keydown',function(e){
+    if(e.key==='ArrowLeft'||e.key==='a')  {keysDown.left=true;  e.preventDefault();}
+    if(e.key==='ArrowRight'||e.key==='d') {keysDown.right=true; e.preventDefault();}
+  });
+  window.addEventListener('keyup',function(e){
+    if(e.key==='ArrowLeft'||e.key==='a')  keysDown.left=false;
+    if(e.key==='ArrowRight'||e.key==='d') keysDown.right=false;
+  });
+
+  score=10; crashes=0; currentSentence=0; currentWord=0;
+  crashed=false; phase='sentence';
+  sentPhaseScore=10; verbPhaseScore=0; vocabPhaseScore=10;
+  sentPhaseCrashes=0; verbPhaseCrashes=0; vocabPhaseCrashes=0;
+  sentPhasePlayed=true; verbPhasePlayed=false; vocabPhasePlayed=false;
+  hitCooldown=0; panelLastLeft=null; panelStreak=0;
+  document.getElementById('hud-label').textContent='Phase 1';
+  document.getElementById('hud-total').textContent=SENTENCES.length;
+
+  loadSentence(0);
+
+  startTime=Date.now();
+  timerInt=setInterval(function(){
+    elapsedSecs=Math.floor((Date.now()-startTime)/1000);
+    document.getElementById('hud-time').textContent=elapsedSecs;
+  },1000);
+
+  gameRunning=true;
+  requestAnimationFrame(gameLoop);
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.add('hidden');});
+  document.getElementById(id).classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════
+//  CANVAS SIZE
+// ═══════════════════════════════════════════
+function resizeCanvas(){
+  CW = window.innerWidth;
+  var hudH   = document.getElementById('hud').offsetHeight || 36;
+  var sentH  = document.getElementById('sentence-area').offsetHeight || 85;
+  var mobH   = (window.innerWidth<=900) ? 62 : 0;
+  CH = Math.max(160, window.innerHeight - hudH - sentH - mobH);
+  canvas.width  = CW;
+  canvas.height = CH;
+  CAR_X = CW/2;
+}
+
+// ═══════════════════════════════════════════
+//  SENTENCE LOADING
+// ═══════════════════════════════════════════
+function loadSentence(idx){
+  currentSentence=idx;
+  currentWord=0;
+  panelRoadY=0.18;
+  hitCooldown=0;
+  document.getElementById('hud-sent').textContent=idx+1;
+  updateBottomBar();
+  makePanels();
+  updateHud();
+}
+
+function updateBottomBar(){
+  var data=getPhaseData();
+  if(phase==='sentence'){
+    var s=data[currentSentence];
+    document.getElementById('spanish-hint').textContent='🇲🇽 '+s.spanish;
+    var built=s.words.slice(0,currentWord);
+    var html='';
+    built.forEach(function(word){
+      for(var i=0;i<word.length;i++){
+        html+='<span style="color:'+COLORS[(currentWord*7+i)%COLORS.length]+';font-weight:900">'+word[i]+'</span>';
+      }
+      html+=' ';
+    });
+    document.getElementById('sentence-built').innerHTML=
+      html||'<span style="color:#888">Use ← → arrows to pick the next word!</span>';
+    var rem=s.words.length-currentWord;
+    document.getElementById('target-hint').textContent=
+      currentWord<s.words.length
+        ? rem+' word'+(rem!==1?'s':'')+' left'
+        : '🎉 Sentence complete!';
+  } else {
+    var a=data[currentSentence];
+    document.getElementById('spanish-hint').textContent='🇲🇽 '+a.prompt;
+    document.getElementById('sentence-built').textContent='';
+    document.getElementById('target-hint').textContent='← Pick the correct option!';
+  }
+}
+
+function getPhaseData(){
+  if(phase==='sentence') return SENTENCES;
+  if(phase==='verb') return VERBS;
+  return VOCAB_SPANISH;  // only used for length, actual matching uses VOCAB_SPANISH/ENGLISH
+}
+
+function getPhaseLen(){
+  if(phase==='sentence') return SENTENCES.length;
+  if(phase==='verb') return VERBS.length;
+  return VOCAB_SPANISH.length;
+}
+
+// ═══════════════════════════════════════════
+//  PANELS
+// ═══════════════════════════════════════════
+function makePanels(){
+  var data=getPhaseData();
+  if(phase==='sentence'){
+    var s=data[currentSentence];
+    if(currentWord>=s.words.length)return;
+    var correct=s.words[currentWord];
+    var wrong=s.wrongs[currentWord]||'---';
+    if(wrong===correct)wrong='---';
+    var correctLeft;
+    if(panelLastLeft===null||panelStreak>=2){
+      correctLeft=panelLastLeft===null?Math.random()<0.5:!panelLastLeft;
+      panelStreak=1;
+    } else {
+      correctLeft=Math.random()<0.6?!panelLastLeft:panelLastLeft;
+      panelStreak=correctLeft===panelLastLeft?panelStreak+1:1;
+    }
+    panelLastLeft=correctLeft;
+    leftPanel ={text:correctLeft?correct:wrong,  isCorrect:correctLeft};
+    rightPanel={text:correctLeft?wrong:correct,  isCorrect:!correctLeft};
+  } else {
+    if(currentWord>=1)return;
+    var a=data[currentSentence];
+    var correct=a.correct;
+    var wrong=a.wrong;
+    var correctLeft;
+    if(panelLastLeft===null||panelStreak>=2){
+      correctLeft=panelLastLeft===null?Math.random()<0.5:!panelLastLeft;
+      panelStreak=1;
+    } else {
+      correctLeft=Math.random()<0.6?!panelLastLeft:panelLastLeft;
+      panelStreak=correctLeft===panelLastLeft?panelStreak+1:1;
+    }
+    panelLastLeft=correctLeft;
+    leftPanel ={text:correctLeft?correct:wrong,  isCorrect:correctLeft};
+    rightPanel={text:correctLeft?wrong:correct,  isCorrect:!correctLeft};
+  }
+  panelRoadY=0.4;
+}
+
+// ═══════════════════════════════════════════
+//  GAME LOOP
+// ═══════════════════════════════════════════
+var bgTime=0;
+var roadOffset=0;
+
+function gameLoop(){
+  if(!gameRunning)return;
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+function update(){
+  bgTime+=0.016;
+  roadOffset=(roadOffset+1.8)%80;
+  if(crashed)return;
+  var steer=3.5;
+  if(keysDown.left)  CAR_X=Math.max(CW*0.08,CAR_X-steer);
+  if(keysDown.right) CAR_X=Math.min(CW*0.92,CAR_X+steer);
+  if(hitCooldown>0){hitCooldown--;return;}
+   panelRoadY+=getPanelSpeed()*(1+panelRoadY*0.8);
+  var roadTop=CH*0.38;
+  var panelScreenY=roadTop+panelRoadY*(CH-roadTop);
+  var carScreenY=CH*CAR_Y_FRAC;
+  if(panelScreenY>=carScreenY-10){
+    var spread=panelRoadY;
+    var panelW=getPanelW(spread);
+    var lx=getPanelLX(spread);
+    var rx=getPanelRX(spread);
+    var inLeft =(CAR_X>lx && CAR_X<lx+panelW);
+    var inRight=(CAR_X>rx && CAR_X<rx+panelW);
+    if(inLeft)       pickPanel(leftPanel);
+    else if(inRight) pickPanel(rightPanel);
+    else             missedPanels();
+  }
+}
+
+function getRoadLeft(t){  return CW*(0.35 - t*0.25); }
+function getRoadRight(t){ return CW*(0.65 + t*0.25); }
+function getPanelW(t){ return Math.max(50,(getRoadRight(t)-getRoadLeft(t))*0.32); }
+function getPanelLX(t){
+  var rl=getRoadLeft(t), rr=getRoadRight(t), hw=(rr-rl)*0.5;
+  return rl + hw*0.02;
+}
+function getPanelRX(t){
+  var rl=getRoadLeft(t), rr=getRoadRight(t), hw=(rr-rl)*0.5;
+  return rl + hw + hw*0.04;
+}
+
+function pickPanel(panel){
+  if(!panel)return;
+  hitCooldown=80;
+  if(panel.isCorrect){
+    currentWord++;
+    updateBottomBar();
+    var totalWords=phase==='sentence'?getPhaseData()[currentSentence].words.length:1;
+    if(currentWord>=totalWords){
+      hitCooldown=160;
+      var next=currentSentence+1;
+      var maxItems=getPhaseLen();
+      if(next<maxItems){
+        setTimeout(function(){loadSentence(next);},800);
+      } else {
+        setTimeout(function(){endPhase();},800);
+      }
+    } else {
+      makePanels();
+    }
+  } else {
+    triggerCrash();
+  }
+}
+
+function missedPanels(){
+  panelRoadY=0.18;
+}
+
+// ═══════════════════════════════════════════
+//  PHASE TRANSITIONS
+// ═══════════════════════════════════════════
+function endPhase(){
+  gameRunning=false;
+  clearInterval(timerInt);
+  if(phase==='sentence'){
+    sentPhaseScore=score;
+    sentPhaseCrashes=crashes;
+    startRound('verb');
+  } else if(phase==='verb'){
+    verbPhaseScore=score;
+    verbPhaseCrashes=crashes;
+    startRound('vocab');
+  } else {
+    vocabPhaseScore=score;
+    vocabPhaseCrashes=crashes;
+    showReport();
+  }
+}
+
+function startRound(nextPhase){
+  var name=nextPhase==='verb'?'2':'3';
+  document.getElementById('round-title').textContent='🏁 PHASE '+name+' 🏁';
+  document.getElementById('round-desc').textContent=nextPhase==='verb'
+    ?'Pick the correct past participle for each verb!'
+    :'Match each Spanish tire to its English tire!';
+  showScreen('round-screen');
+  var el=document.getElementById('round-count');
+  el.textContent='3';
+  el.style.color='#fff';
+  el.style.textShadow='0 0 40px #e74c3c';
+  var count=3;
+  var r2Int=setInterval(function(){
+    count--;
+    if(count>0){
+      el.textContent=count;
+    }else if(count===0){
+      el.textContent='GO!';
+      el.style.color='#2ecc71';
+      el.style.textShadow='0 0 40px #2ecc71';
+    }else{
+      clearInterval(r2Int);
+      startPhase(nextPhase);
+    }
+  },1200);
+}
+
+function startPhase(newPhase){
+  phase=newPhase;
+  currentSentence=0;
+  currentWord=0;
+  score=10;
+  crashes=0;
+  panelLastLeft=null;
+  panelStreak=0;
+  if(newPhase==='verb'){
+    verbPhasePlayed=true;
+    document.getElementById('hud-label').textContent='Phase 2';
+    document.getElementById('hud-total').textContent=getPhaseLen();
+    updateHud();
+    showScreen('game-screen');
+    gameRunning=true;
+    loadSentence(0);
+    requestAnimationFrame(gameLoop);
+  } else {
+    // Phase 3 – matching game
+    vocabPhasePlayed=true;
+    startMatchGame();
+  }
+}
+
+// ═══════════════════════════════════════════
+//  MATCHING GAME (Phase 3) – Cycling Tire
+// ═══════════════════════════════════════════
+var matchPhaseOrder=[];  // shuffled indices for cycling english words
+
+var matchTargetIdx=-1;   // vocab index of the Spanish word shown (the target)
+var matchCurrentIdx=-1;  // vocab index currently shown in right tire
+var matchPairsDone=0;
+var matchTimer=null;
+var matchCaught=false;
+var matchUsed=[];
+
+function startMatchGame(){
+  showScreen('match-screen');
+  score=10;
+  crashes=0;
+  matchPairsDone=0;
+  matchCurrentIdx=-1;
+  matchTargetIdx=-1;
+  matchCaught=false;
+  matchUsed=[];
+  for(var mu=0;mu<VOCAB_SPANISH.length;mu++){matchUsed.push(false);}
+
+  // Build cycling order: shuffled indices of all vocab
+  matchPhaseOrder=[];
+  for(var mo=0;mo<VOCAB_SPANISH.length;mo++){matchPhaseOrder.push(mo);}
+  shuffle(matchPhaseOrder);
+
+  document.getElementById('match-score').textContent='10.0';
+  document.getElementById('match-completed').innerHTML='';
+  document.getElementById('match-next-btn').style.display='none';
+  document.getElementById('match-hint').textContent='Watch the English tire...';
+
+  // Show first Spanish word (target)
+  matchTargetIdx=matchPhaseOrder[0];
+  setCurrentSpanish(matchTargetIdx);
+
+  // Show first English word (random, not the target)
+  var firstPick;
+  for(var fi=0;fi<matchPhaseOrder.length;fi++){
+    if(matchPhaseOrder[fi]!==matchTargetIdx){firstPick=matchPhaseOrder[fi];break;}
+  }
+  matchCurrentIdx=firstPick!==undefined?firstPick:matchTargetIdx;
+  setEnglishTire(matchCurrentIdx);
+
+  // Start cycling timer (dynamic delay)
+  clearTimeout(matchTimer);
+  scheduleNextCycle();
+}
+
+function setCurrentSpanish(idx){
+  document.getElementById('tire-current-spanish').textContent=VOCAB_SPANISH[idx];
+}
+
+function setEnglishTire(idx,className){
+  var el=document.getElementById('tire-cycling-english');
+  el.textContent=VOCAB_ENGLISH[idx];
+  var tread=document.getElementById('tire-english-tread');
+  tread.className='tire-tread'+(className?' '+className:'');
+  void tread.offsetWidth;
+  if(!className) tread.classList.add('pulse');
+}
+
+function scheduleNextCycle(){
+  clearTimeout(matchTimer);
+  var delay=(matchCurrentIdx===matchTargetIdx) ? 1800 : 1000;
+  matchTimer=setTimeout(cycleEnglish,delay);
+}
+
+function cycleEnglish(){
+  if(matchCaught) return;
+  if(matchPairsDone>=VOCAB_SPANISH.length){
+    document.getElementById('match-next-btn').style.display='block';
+    return;
+  }
+  // Build pool of available words
+  var unused=[];
+  for(var ci=0;ci<matchPhaseOrder.length;ci++){
+    var idx=matchPhaseOrder[ci];
+    if(!matchUsed[idx]) unused.push(idx);
+  }
+  if(unused.length===0){
+    document.getElementById('match-next-btn').style.display='block';
+    return;
+  }
+  // When only a few left, add already-matched words as distractors
+  var pool = unused.slice();
+  if(unused.length <= 3) {
+    for(var di=0; di<matchPhaseOrder.length; di++) {
+      var didx=matchPhaseOrder[di];
+      if(matchUsed[didx]) pool.push(didx);
+    }
+  }
+  var pick=pool[Math.floor(Math.random()*pool.length)];
+  matchCurrentIdx=pick;
+  setEnglishTire(pick);
+  scheduleNextCycle();
+}
+
+function catchTire(){
+  if(matchPairsDone>=VOCAB_SPANISH.length)return;
+  if(matchCaught)return;
+  matchCaught=true;
+
+  var tread=document.getElementById('tire-english-tread');
+
+  if(matchCurrentIdx===matchTargetIdx){
+    // Correct match!
+    matchUsed[matchTargetIdx]=true;
+    matchPairsDone++;
+    document.getElementById('match-score').textContent=score.toFixed(1);
+    tread.className='tire-tread caught';
+    document.getElementById('match-hint').textContent='Correct!';
+
+    // Add to completed list
+    var comp=document.getElementById('match-completed');
+    var row=document.createElement('div');
+    row.className='match-done';
+    row.innerHTML='<span class="md-left">'+VOCAB_SPANISH[matchTargetIdx]+'</span><span class="md-check">✓</span><span class="md-right">'+VOCAB_ENGLISH[matchTargetIdx]+'</span>';
+    comp.appendChild(row);
+
+    // Find next target (first unmatched in order)
+    var nextTarget=-1;
+    for(var ni=0;ni<matchPhaseOrder.length;ni++){
+      if(!matchUsed[matchPhaseOrder[ni]]){nextTarget=matchPhaseOrder[ni];break;}
+    }
+    if(nextTarget>=0){
+      matchTargetIdx=nextTarget;
+      setCurrentSpanish(nextTarget);
+      clearTimeout(matchTimer);
+      setTimeout(function(){
+        matchCaught=false;
+        document.getElementById('match-hint').textContent='Watch the English tire...';
+        cycleEnglish();
+      },1000);
+    } else {
+      clearTimeout(matchTimer);
+      document.getElementById('match-next-btn').style.display='block';
+      document.getElementById('match-hint').textContent='All matched!';
+    }
+  } else {
+    clearTimeout(matchTimer);
+    triggerCrash();
+    tread.className='tire-tread wrong';
+    document.getElementById('match-score').textContent=score.toFixed(1);
+  }
+}
+
+function shuffle(arr){
+  for(var i=arr.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var tmp=arr[i];arr[i]=arr[j];arr[j]=tmp;
+  }
+}
+
+function finishMatchPhase(){
+  vocabPhaseScore=score;
+  vocabPhaseCrashes=crashes;
+  showReport();
+}
+
+// ═══════════════════════════════════════════
+//  CRASH
+// ═══════════════════════════════════════════
+function triggerCrash(){
+  if(crashed)return;
+  crashed=true;
+  crashes++;
+  score=Math.max(0,score-0.5);
+  updateHud();
+  document.getElementById('crash-overlay').classList.add('show');
+  var over=(crashes>=3);
+  document.getElementById('crash-msg').textContent=over
+    ?'Three crashes – game over! Score: '+score.toFixed(1)+'/10'
+    :'Wrong! -0.5 pts  |  Score: '+score.toFixed(1)+'  |  Crashes: '+crashes+'/3';
+  document.getElementById('crash-btn').textContent=over?'📋 See Results':'🚗 Try Again!';
+}
+
+function resumeAfterCrash(){
+  document.getElementById('crash-overlay').classList.remove('show');
+  if(crashes>=3){
+    if(phase==='sentence'){sentPhaseScore=score;sentPhaseCrashes=crashes;}
+    else if(phase==='verb'){verbPhaseScore=score;verbPhaseCrashes=crashes;}
+    else{vocabPhaseScore=score;vocabPhaseCrashes=crashes;}
+    gameRunning=false;
+    showReport();
+    return;
+  }
+  if(phase==='vocab'){
+    matchCaught=false;
+    crashed=false;
+    setEnglishTire(matchCurrentIdx);
+    scheduleNextCycle();
+    return;
+  }
+  currentWord=0;
+  panelRoadY=0.18;
+  hitCooldown=0;
+  makePanels();
+  updateBottomBar();
+  CAR_X=CW/2;
+  crashed=false;
+}
+
+// ═══════════════════════════════════════════
+//  DRAW
+// ═══════════════════════════════════════════
+function draw(){
+  ctx.clearRect(0,0,CW,CH);
+  var theme=BG_THEMES[currentSentence%BG_THEMES.length];
+  drawBg(theme);
+  drawRoad();
+  drawPanels();
+  drawCar();
+}
+
+function drawBg(theme){
+  var hor=CH*0.42;
+  var g=ctx.createLinearGradient(0,0,0,hor);
+  g.addColorStop(0,theme.skyTop);
+  g.addColorStop(1,theme.skyBot);
+  ctx.fillStyle=g; ctx.fillRect(0,0,CW,hor);
+  if(currentSentence===2){
+    for(var i=0;i<60;i++){
+      var sx=(i*173+7)%CW, sy=(i*97+3)%(hor*0.9);
+      ctx.fillStyle='rgba(255,255,255,'+(Math.sin(bgTime*2.5+i)*0.5+0.5)+')';
+      ctx.fillRect(sx,sy,2,2);
+    }
+  }
+  if(currentSentence===2){
+    var mx=CW*0.8,my=CH*0.09+Math.sin(bgTime*.3)*4;
+    ctx.fillStyle='#FFFACD';
+    ctx.beginPath();ctx.arc(mx,my,20,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=theme.skyTop;
+    ctx.beginPath();ctx.arc(mx+7,my-4,14,0,Math.PI*2);ctx.fill();
+  } else {
+    var sunX=CW*0.82+Math.sin(bgTime*.2)*3,sunY=CH*0.08;
+    var sg=ctx.createRadialGradient(sunX,sunY,0,sunX,sunY,22);
+    sg.addColorStop(0,'#FFE44D');sg.addColorStop(1,'#FF8C00');
+    ctx.fillStyle=sg;ctx.beginPath();ctx.arc(sunX,sunY,20,0,Math.PI*2);ctx.fill();
+    for(var ri=0;ri<8;ri++){
+      var ra=ri*Math.PI/4+bgTime*.4;
+      ctx.strokeStyle='rgba(255,200,0,.45)';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(sunX+Math.cos(ra)*23,sunY+Math.sin(ra)*23);
+      ctx.lineTo(sunX+Math.cos(ra)*34,sunY+Math.sin(ra)*34);ctx.stroke();
+    }
+  }
+  for(var ci=0;ci<4;ci++){
+    var cx=((bgTime*18*(1+ci*.25)+ci*(CW/4)+CW*2)%(CW+220))-110;
+    var cy=CH*0.06+ci*CH*0.05;
+    drawCloud(cx,cy,32+ci*10,0.85-ci*.08);
+  }
+  ctx.fillStyle=darken(theme.grass,.6);
+  ctx.beginPath();ctx.moveTo(0,hor);
+  for(var hx=0;hx<=CW;hx+=8){
+    ctx.lineTo(hx,hor-CH*0.08-Math.sin((hx+bgTime*10)/110)*CH*0.07);
+  }
+  ctx.lineTo(CW,hor);ctx.closePath();ctx.fill();
+  ctx.fillStyle=theme.grass;ctx.fillRect(0,hor,CW,CH-hor);
+  for(var ti=0;ti<5;ti++){
+    var tx=((bgTime*20+ti*(CW/5)+30)%(CW+100))-50;
+    drawTree(tx,CH*0.50,0.4+ti*.08);
+  }
+  drawBird((bgTime*26+20)%(CW+60)-30,CH*0.2);
+  if(currentSentence===5){
+    ctx.strokeStyle='rgba(150,180,255,.35)';ctx.lineWidth=1;
+    for(var rr=0;rr<25;rr++){
+      var rrx=(rr*71+bgTime*70)%(CW+20)-10;
+      var rry=(rr*53+bgTime*130)%(hor);
+      ctx.beginPath();ctx.moveTo(rrx,rry);ctx.lineTo(rrx-2,rry+10);ctx.stroke();
+    }
+  }
+}
+
+function drawCloud(cx,cy,r,a){
+  ctx.save();ctx.globalAlpha=a;ctx.fillStyle='#fff';
+  [[0,0,r],[r*.6,-r*.28,r*.72],[r*1.1,0,r*.82],[r*1.75,r*.1,r*.6]].forEach(function(b){
+    ctx.beginPath();ctx.arc(cx+b[0],cy+b[1],b[2],0,Math.PI*2);ctx.fill();
+  });
+  ctx.restore();
+}
+function drawTree(x,y,sc){
+  ctx.fillStyle='#5D4037';ctx.fillRect(x-5*sc,y,10*sc,25*sc);
+  ctx.fillStyle='#2E7D32';ctx.beginPath();ctx.arc(x,y,17*sc,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#388E3C';ctx.beginPath();ctx.arc(x,y-8*sc,12*sc,0,Math.PI*2);ctx.fill();
+}
+function drawBird(x,y){
+  var f=Math.sin(bgTime*9)*7;
+  ctx.strokeStyle='#333';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x-9,y-f,x-18,y);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+9,y-f,x+18,y);ctx.stroke();
+}
+function darken(hex,f){
+  var n=parseInt(hex.replace('#',''),16);
+  var r=Math.round(((n>>16)&255)*f),g=Math.round(((n>>8)&255)*f),b=Math.round((n&255)*f);
+  return 'rgb('+Math.min(255,r)+','+Math.min(255,g)+','+Math.min(255,b)+')';
+}
+
+function drawRoad(){
+  var rl0=getRoadLeft(0),  rr0=getRoadRight(0);
+  var rl1=getRoadLeft(1),  rr1=getRoadRight(1);
+  var roadTop=CH*0.38;
+  ctx.fillStyle='#4A4A4A';
+  ctx.beginPath();
+  ctx.moveTo(rl0,roadTop);ctx.lineTo(rr0,roadTop);
+  ctx.lineTo(rr1,CH);     ctx.lineTo(rl1,CH);
+  ctx.closePath();ctx.fill();
+  for(var pct=0;pct<1;pct+=0.1){
+    var ap=(pct+roadOffset/100)%1;
+    var y=roadTop+ap*(CH-roadTop);
+    var t=ap;
+    var mid=(getRoadLeft(t)+getRoadRight(t))/2;
+    var dw=(getRoadRight(t)-getRoadLeft(t))*0.03;
+    ctx.fillStyle='rgba(255,255,255,'+(0.25+ap*0.55)+')';
+    ctx.fillRect(mid-dw,y,dw*2,Math.max(2,ap*7));
+  }
+  ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(rl0,roadTop);ctx.lineTo(rl1,CH);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(rr0,roadTop);ctx.lineTo(rr1,CH);ctx.stroke();
+}
+
+function drawPanels(){
+  if(!leftPanel||!rightPanel)return;
+  var t=panelRoadY;
+  var roadTop=CH*0.38;
+  var panelScreenY=roadTop+t*(CH-roadTop);
+  var pw=getPanelW(t);
+  var ph=Math.max(28,pw*0.4);
+  var lx=getPanelLX(t);
+  var rx=getPanelRX(t);
+  drawSign(lx,panelScreenY,pw,ph,leftPanel.text,t);
+  drawSign(rx,panelScreenY,pw,ph,rightPanel.text,t);
+  if(pw>60){
+    ctx.fillStyle='rgba(231,76,60,.95)';
+    ctx.font='bold '+Math.min(16,pw*0.22)+'px Fredoka One,cursive';
+    ctx.textAlign='center';ctx.textBaseline='bottom';
+    ctx.fillText('← LEFT', lx+pw/2, panelScreenY-3);
+    ctx.fillText('RIGHT →',rx+pw/2, panelScreenY-3);
+  }
+}
+
+function drawSign(x,y,w,h,text,t){
+  var postH=Math.max(10,h*0.6);
+  ctx.fillStyle='#6D4C41';
+  ctx.fillRect(x+w/2-Math.max(2,w*0.05),y+h,Math.max(4,w*0.1),postH);
+  ctx.fillStyle='#FFFDE7';
+  ctx.strokeStyle='#E65100';ctx.lineWidth=Math.max(1.5,w*0.04);
+  rrect(x,y,w,h,Math.max(4,w*0.1));
+  ctx.fill();ctx.stroke();
+  var fs=Math.min(16,Math.max(8,Math.floor(w/(text.length+1)*1.7)),Math.floor(h*0.52));
+  ctx.fillStyle='#1a1a2e';
+  ctx.font='bold '+fs+'px Fredoka One,cursive';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(text,x+w/2,y+h/2);
+}
+
+function rrect(x,y,w,h,r){
+  r=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
+}
+
+// ─── RED CAR ──────────────────────────────
+function drawCar(){
+  var carScreenY=CH*CAR_Y_FRAC;
+  if(crashed){drawCrashedCar(carScreenY);return;}
+  var cw=Math.max(38,CW*0.065);
+  var ch=cw*0.48;
+  var x=CAR_X-cw/2, y=carScreenY-ch;
+  ctx.fillStyle='rgba(0,0,0,.18)';
+  ctx.beginPath();ctx.ellipse(CAR_X,carScreenY+2,cw*.6,ch*.3,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#e74c3c';
+  ctx.beginPath();
+  ctx.moveTo(x+cw*.1,y+ch);ctx.lineTo(x+cw*.9,y+ch);
+  ctx.lineTo(x+cw,y+ch*.55);ctx.lineTo(x+cw*.78,y+ch*.04);
+  ctx.lineTo(x+cw*.22,y+ch*.04);ctx.lineTo(x,y+ch*.55);
+  ctx.closePath();ctx.fill();
+  ctx.fillStyle='#c0392b';
+  ctx.beginPath();
+  ctx.moveTo(x+cw*.26,y+ch*.04);ctx.lineTo(x+cw*.74,y+ch*.04);
+  ctx.lineTo(x+cw*.68,y-ch*.24);ctx.lineTo(x+cw*.32,y-ch*.24);
+  ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(135,206,250,.85)';
+  ctx.beginPath();
+  ctx.moveTo(x+cw*.29,y+ch*.03);ctx.lineTo(x+cw*.71,y+ch*.03);
+  ctx.lineTo(x+cw*.65,y-ch*.21);ctx.lineTo(x+cw*.35,y-ch*.21);
+  ctx.closePath();ctx.fill();
+  ctx.fillStyle='#1a1a2e';
+  [[x+cw*.17,y+ch],[x+cw*.83,y+ch]].forEach(function(w){
+    ctx.beginPath();ctx.ellipse(w[0],w[1],cw*.15,ch*.24,0,0,Math.PI*2);ctx.fill();
+  });
+  ctx.strokeStyle='#aaa';ctx.lineWidth=1.5;
+  [[x+cw*.17,y+ch],[x+cw*.83,y+ch]].forEach(function(w){
+    var a=bgTime*6;
+    ctx.beginPath();
+    ctx.moveTo(w[0]+Math.cos(a)*cw*.09,w[1]+Math.sin(a)*ch*.16);
+    ctx.lineTo(w[0]-Math.cos(a)*cw*.09,w[1]-Math.sin(a)*ch*.16);
+    ctx.stroke();
+  });
+  ctx.fillStyle='rgba(255,255,180,.85)';
+  ctx.beginPath();ctx.arc(x+cw*.11,y+ch*.5,cw*.055,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(x+cw*.89,y+ch*.5,cw*.055,0,Math.PI*2);ctx.fill();
+}
+
+function drawCrashedCar(carScreenY){
+  ctx.save();
+  ctx.translate(CAR_X,carScreenY);
+  ctx.rotate(Math.sin(bgTime*14)*.22);
+  var cw=Math.max(38,CW*0.065),ch=cw*0.48;
+  ctx.fillStyle='#888';
+  ctx.fillRect(-cw/2,-ch,cw,ch);
+  for(var i=0;i<5;i++){
+    var a=bgTime*3+i*1.2;
+    ctx.fillStyle='rgba(180,180,180,'+(0.55-i*.08)+')';
+    ctx.beginPath();
+    ctx.arc(Math.cos(a)*12,-ch-i*12-(bgTime*4%22),6+i*3,0,Math.PI*2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+// ═══════════════════════════════════════════
+//  HUD
+// ═══════════════════════════════════════════
+function updateHud(){
+  document.getElementById('hud-score').textContent=score.toFixed(1);
+  document.getElementById('hud-crashes').textContent=crashes;
+}
+
+// ═══════════════════════════════════════════
+//  REPORT CARD
+// ═══════════════════════════════════════════
+function showReport(){
+  gameRunning=false;
+  if(timerInt)clearInterval(timerInt);
+  showScreen('report-screen');
+  document.getElementById('rc-name').textContent=studentName;
+  document.getElementById('rc-group').textContent='Group '+studentGroup;
+  document.getElementById('rc-date').textContent=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('rc-time').textContent=elapsedSecs+' seconds';
+
+  var totalCrashes=sentPhaseCrashes+verbPhaseCrashes+vocabPhaseCrashes;
+  document.getElementById('rc-crashes').textContent=totalCrashes+' crash'+(totalCrashes!==1?'es':'');
+
+  var sentScore=parseFloat(sentPhaseScore.toFixed(1));
+  var verbScore=verbPhasePlayed?parseFloat(verbPhaseScore.toFixed(1)):0;
+  var vocabScore=vocabPhasePlayed?parseFloat(vocabPhaseScore.toFixed(1)):0;
+
+  var phasesPlayed=1;
+  if(verbPhasePlayed) phasesPlayed=2;
+  if(vocabPhasePlayed) phasesPlayed=3;
+
+  var totalScore=sentScore;
+  if(verbPhasePlayed) totalScore+=verbScore;
+  if(vocabPhasePlayed) totalScore+=vocabScore;
+
+  var final;
+  if(!verbPhasePlayed){
+    final=Math.min(6,sentScore);
+  } else {
+    final=Math.max(0,Math.min(10,totalScore/phasesPlayed));
+  }
+  var fs=(Math.floor(final*10)/10).toFixed(1);
+
+  document.getElementById('rc-sent-score').textContent=sentScore.toFixed(1)+' / 10';
+  document.getElementById('rc-verb-score').textContent=verbPhasePlayed?verbScore.toFixed(1)+' / 10':'N/A';
+  document.getElementById('rc-vocab-score').textContent=vocabPhasePlayed?vocabScore.toFixed(1)+' / 10':'N/A';
+  document.getElementById('rc-final-label').textContent=fs+' / 10';
+
+  var ge=document.getElementById('rc-grade');
+  ge.textContent=fs;
+  var stars=document.getElementById('rc-stars');
+  var tip=document.getElementById('rc-tip');
+  if(final>=9){ge.className='grade-big a';stars.textContent='⭐⭐⭐⭐⭐';tip.textContent='Outstanding! You are a Present Perfect Champion! 🏆';}
+  else if(final>=7){ge.className='grade-big a';stars.textContent='⭐⭐⭐⭐';tip.textContent='Great job! Keep practicing present perfect! 🌟';}
+  else if(final>=5){ge.className='grade-big b';stars.textContent='⭐⭐⭐';tip.textContent='Good effort! Review the rules and try again!';}
+  else{ge.className='grade-big c';stars.textContent='⭐⭐';tip.textContent='Keep practicing! You can do it! 💪';}
+}
+</script>
+</body>
+</html>
